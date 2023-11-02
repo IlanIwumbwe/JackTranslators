@@ -1,10 +1,8 @@
 #! /bin/sh
 
 # cleanup
-rm -f compiler
+make -f Compiler/makefile.mk clean
 
 # build compiler 
-make -j -f makefile compiler
-
-# run compiler executable
-./compiler
+make -j -C Compiler/ -f makefile.mk
+echo "Finished building compiler in Compiler/ directory"
