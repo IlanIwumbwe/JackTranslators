@@ -353,10 +353,6 @@ class VMtranslator{
             for (const auto & current_path : file_paths){
                 std::vector<std::string> instructions = parser.Parse(current_path);
 
-                for(auto p : instructions){
-                    std::cout << p << std::endl;
-                }
-
                 codewriter.SetFilePath(current_path);
 
                 for (int index = 0; index < instructions.size(); index++){
@@ -405,26 +401,6 @@ class VMtranslator{
             output_file << "// end loop\n" + codewriter.WriteEndLoop() << std::endl;
 
             output_file.close();
-        }
-
-
-        void run()
-        {
-            std::string FILE_PATH;
-
-            std::cout << "Enter path of VM file: ";
-            std::cin >> FILE_PATH;
-
-            std::vector<std::string> paths = GetFilesToParse(FILE_PATH, ".vm");
-
-            VMtranslator vmt;
-            
-            std::string output_path = GetOutputPath(FILE_PATH, ".asm", "");
-            std::ofstream outfile(output_path);
-
-            vmt.Translate(paths, outfile);
-
-            std::cout << "Done writing assembly to: " << output_path << std::endl;
         }
         
     private:

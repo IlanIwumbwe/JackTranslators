@@ -35,28 +35,6 @@ struct XML_TAGS{
     }
 };
 
-
-std::string fileType(const std::string& path){
-    // return jack or vm based on path (could be single file or directory)
-
-    if(!fs::is_directory(path)){
-        auto ext = fs::path(path).extension();
-        
-        //std::cout << fs::path(path).filename();
-        return (ext == ".vm" || ext == ".jack") ? ext : "null";
-    } else {
-        auto it = fs::directory_iterator(path);
-        
-        if(it != fs::directory_iterator{}){
-            auto ext = it->path().extension();  
-           
-            return (ext == ".vm" || ext == ".jack") ? ext : "null"; // return extension of the first entry in the directory
-        } else {
-            return "null";
-        }
-    }
-}
-
 // helper functions
 
 /// Returns a vector of paths
@@ -90,10 +68,10 @@ std::vector<std::string> GetFilesToParse(std::string& path, std::string input_ex
 }
 
 std::string GetOutputPath(std::string& input_path, std::string output_extension, std::string compiler_flag){
-    fs::path path(input_path);
+    auto path = fs::path(input_path);
 
     if (fs::is_directory(path)){
-        return input_path + "\\" + path.filename().string() + output_extension;   
+        return path / (path.filename().string() + output_extension);
         
     } else {
         if (compiler_flag != ""){
@@ -146,44 +124,6 @@ std::string GetTokenXML(std::string tkn, std::string tkn_type){
         return std::regex_replace(xml, pattern, " "  + tkn + " ");
     }
 }
-
-/// Final form of code, whether or not to save program tokens and parse tree
-std::pair<std::string, bool> processCompilerCommand(int argc, char* argv[]){
-    std::string finalform = "";
-    bool tokens = false;
-    
-    if(argc == 3){
-        if(strcmp(argv[2], "--vm") == 0|| strcmp(argv[2], "--asm") == 0){
-            finalform = argv[2];
-        } else {
-            std::cout << "Wrong compiler flag, expected '--asm' or '--vm' " << std::endl;
-        }
-    } else if (argc == 4){
-        if(strcmp(argv[2], "--t") == 0){
-            tokens = true;
-        } else {
-            std::cout << "Wrong compiler flag, expected '--t'" << std::endl;
-        }
-
-        if(strcmp(argv[3], "--vm") == 0|| strcmp(argv[3], "--asm") == 0){
-            finalform = argv[3];
-        } else {
-            std::cout << "Wrong compiler flag, expected '--asm' or '--vm' " << std::endl;
-        }
-
-    } else if (argc == 2){
-        // compile to asm
-        finalform = "--asm";
-
-    } else {
-        std::cout << "Wrong number of arguments to compiler " << std::endl;
-    }
-
-    return std::make_pair(finalform, tokens);
-}
-
-
-// headers
 
 
 #endif
