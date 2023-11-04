@@ -1,16 +1,44 @@
-#include <vector>
-#include <filesystem>
-#include <iostream>
-#include <string>
-#include <map>
-#include <regex>
-#include "./helper_funcs.hpp"
+#ifndef HELPER_FUNCS_H
+#define HELPER_FUNCS_H
 
+// common imports
+#include <string>
+#include <filesystem>
+#include <vector>
+#include <algorithm>
+#include <regex>
+#include <iostream>
+#include <fstream>
+
+// namespace for filesystem
 namespace fs = std::filesystem;
 
-XML_TAGS xml_tags;
+// helper struct
+struct XML_TAGS{
+    //std::string keyword = 
+    //std::string symbol = 
+    //std::string int_const = 
+    //std::string str_const = 
+    //std::string identifier = 
+    static std::string GetXmlTag(std::string tkn_type){
+        if (tkn_type == "KEYWORD"){
+            return "<keyword>_</keyword>";
+        } else if (tkn_type == "SYMBOL"){
+            return "<symbol>_</symbol>";
+        } else if (tkn_type == "INT_CONST"){
+            return "<integerConstant>_</integerConstant>";
+        } else if (tkn_type == "STRING_CONST"){
+            return "<stringConstant>_</stringConstant>";
+        } else {
+            return "<identifier>_</identifier>";
+        }
+    }
+};
 
-std::vector<std::string> GetFilesToParse(std::string &path, std::string input_extension){
+// helper functions
+
+/// Returns a vector of paths
+std::vector<std::string> GetFilesToParse(std::string& path, std::string input_extension){
     std::vector<std::string> paths;
 
     if (!fs::is_directory(path)){
@@ -19,6 +47,7 @@ std::vector<std::string> GetFilesToParse(std::string &path, std::string input_ex
     } else{
         std::string main_path = "";
 
+        // enforce compilation order so that all classes are defined
         for (const auto& entry : fs::directory_iterator(path))
         {   
             if (entry.path().filename() == "Main" + input_extension){
@@ -31,7 +60,6 @@ std::vector<std::string> GetFilesToParse(std::string &path, std::string input_ex
         if (main_path == ""){
             std::cout << "Entry point should be named 'Main'" << std::endl;
         } else {
-            // enforce compilation order so that all classes are defined
             paths.push_back(main_path);
         }   
     }
@@ -39,11 +67,11 @@ std::vector<std::string> GetFilesToParse(std::string &path, std::string input_ex
     return paths;
 }
 
-std::string GetOutputPath(std::string &input_path, std::string output_extension, std::string compiler_flag){
-    fs::path path(input_path);
+std::string GetOutputPath(std::string& input_path, std::string output_extension, std::string compiler_flag){
+    auto path = fs::path(input_path);
 
     if (fs::is_directory(path)){
-        return input_path + "\\" + path.filename().string() + output_extension;   
+        return path / (path.filename().string() + output_extension);
         
     } else {
         if (compiler_flag != ""){
@@ -55,7 +83,7 @@ std::string GetOutputPath(std::string &input_path, std::string output_extension,
     }
 }
 
-std::vector<std::string> splitString(const std::string& input, const std::string& delimiter) {
+std::vector<std::string> splitString(const std::string& input, const std::string& delimiter){
     std::vector<std::string> result;
     std::regex regexDelimiter(delimiter);
     std::sregex_token_iterator iterator(input.begin(), input.end(), regexDelimiter, -1);
@@ -76,8 +104,7 @@ std::string removeWhiteSpace(std::string str){
 }
 
 std::string GetTokenXML(std::string tkn, std::string tkn_type){
-
-    std::string xml = xml_tags.GetXmlTag(tkn_type);
+    std::string xml = XML_TAGS::GetXmlTag(tkn_type);
     std::regex pattern("_");
     
     if (tkn == "<"){
@@ -97,3 +124,6 @@ std::string GetTokenXML(std::string tkn, std::string tkn_type){
         return std::regex_replace(xml, pattern, " "  + tkn + " ");
     }
 }
+
+
+#endif
