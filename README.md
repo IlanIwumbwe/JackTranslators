@@ -1,7 +1,7 @@
 # JackTranslators
 
 ## Running the compiler
-Use `./run.sh` to build, which creates a `compiler` executable. \\
+Use `./run.sh` to build, which creates a `compiler` executable.  
 Run it like so: `./compiler -p <path> -i <initial> -f <final> -t`. 
 - `<initial>` can be `jack` or `vm`.
 - `<final>` can only be `asm`
